@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from gendiff.core import generate_diff
 
 
 def main():
@@ -17,9 +18,8 @@ def main():
     )
     args = parser.parse_args()
     
-    # Для первого шага просто выводим имена файлов
-    print(f"Comparing {args.first_file} and {args.second_file}")
-    print(f"Output format: {args.format}")
+    diff = generate_diff(args.first_file, args.second_file, args.format)
+    print(diff)
 
 if __name__ == '__main__':
     main()
