@@ -1,4 +1,4 @@
-from gendiff.scripts.gendiff import main
+from gendiff.core import generate_diff
 
 __version__ = '0.1.0'
-__all__ = ['main']
+__all__ = ['generate_diff']
