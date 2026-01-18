@@ -48,3 +48,10 @@ htmlcov/
 coverage.xml
 *.cover
 .hypothesis/
+
+# Project specific
+*.json
+*.yaml
+*.yml
+*.cast
+demo.gif
