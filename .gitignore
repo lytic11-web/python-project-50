@@ -55,3 +55,16 @@ coverage.xml
 *.yml
 *.cast
 demo.gif
+
+# Cache and temporary files
+__pycache__/
+.pytest_cache/
+.coverage
+coverage.xml
+*.cast
+
+# Test files in root directory
+file*.json
+file*.yaml
+file*.yml
+test_*.py
