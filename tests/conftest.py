@@ -1,0 +1,29 @@
+import os
+
+import pytest
+
+
+def get_fixture_path(file_name):
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(current_dir, "test_data", file_name)
+
+
+def read_fixture(file_name):
+    path = get_fixture_path(file_name)
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read().strip()
+
+
+@pytest.fixture
+def flat_json1_path():
+    return get_fixture_path("flat/file1.json")
+
+
+@pytest.fixture
+def flat_json2_path():
+    return get_fixture_path("flat/file2.json")
+
+
+@pytest.fixture
+def expected_stylish():
+    return read_fixture("flat/expected_stylish.txt")

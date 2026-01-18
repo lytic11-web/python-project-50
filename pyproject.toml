@@ -14,5 +14,12 @@ authors = [{name = "Alexandr A.", email = "mail@example.com"}]
 [project.scripts]
 gendiff = "gendiff.scripts.gendiff:main"
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["gendiff"]
