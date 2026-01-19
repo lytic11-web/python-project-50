@@ -7,15 +7,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.12
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
       - name: Install dependencies
         run: |
           pip install uv
@@ -24,11 +21,13 @@ jobs:
         run: |
           make check
       - name: Run test coverage
-        if: matrix.python-version == '3.12'
         run: |
           make test-coverage
+          echo "=== Coverage file created ==="
+          ls -la coverage.xml
+          echo "=== First few lines ==="
+          head -3 coverage.xml
       - name: SonarQubeScan
-        if: matrix.python-version == '3.12'
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -37,3 +36,5 @@ jobs:
             -Dsonar.projectKey=lytic11-web_python-project-50
             -Dsonar.organization=lytic11-web
             -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.sources=gendiff
+            -Dsonar.tests=tests
