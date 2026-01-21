@@ -27,3 +27,13 @@ def flat_json2_path():
 @pytest.fixture
 def expected_stylish():
     return read_fixture("flat/expected_stylish.txt")
+
+
+@pytest.fixture
+def flat_yaml1_path():
+    return get_fixture_path("flat/file1.yml")
+
+
+@pytest.fixture
+def flat_yaml2_path():
+    return get_fixture_path("flat/file2.yml")

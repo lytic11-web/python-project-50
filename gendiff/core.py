@@ -1,11 +1,12 @@
 import json
 from typing import Any, Dict, List
 
+from gendiff.parsers import parse_file
+
 
 def read_file(file_path: str) -> Dict[str, Any]:
-    """Читает и парсит JSON файл."""
-    with open(file_path, "r", encoding="utf-8") as file:
-        return json.load(file)
+    """Читает и парсит JSON или YAML файлы."""
+    return parse_file(file_path)
 
 
 def get_diff(
