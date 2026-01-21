@@ -19,12 +19,25 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
-# Virtual environments
-.venv/
-venv/
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Environments
+.env
+.venv
 env/
+venv/
 ENV/
 env.bak/
 venv.bak/
@@ -35,36 +48,14 @@ venv.bak/
 *.swp
 *.swo
 
-# System
+# OS
 .DS_Store
 Thumbs.db
 
-# Testing
-.coverage
-htmlcov/
-.pytest_cache/
-.tox/
-.nox/
-coverage.xml
-*.cover
-.hypothesis/
-
-# Project specific
-*.json
-*.yaml
-*.yml
-*.cast
-demo.gif
-
-# Cache and temporary files
-__pycache__/
-.pytest_cache/
-.coverage
+# Project files
 coverage.xml
 *.cast
+*.log
 
-# Test files in root directory
-file*.json
-file*.yaml
-file*.yml
-test_*.py
+# Но НЕ игнорируем тестовые данные!
+!tests/test_data/
