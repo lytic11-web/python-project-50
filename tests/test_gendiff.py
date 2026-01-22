@@ -9,9 +9,7 @@ def test_generate_diff_flat_yaml(
     assert result == expected_stylish
 
 
-def test_generate_diff_flat_yaml_with_format(
-    flat_yaml1_path, flat_yaml2_path
-):
+def test_generate_diff_flat_yaml_with_format(flat_yaml1_path, flat_yaml2_path):
     """Test flat YAML comparison with explicit format."""
     result = generate_diff(flat_yaml1_path, flat_yaml2_path, "stylish")
     assert "follow: false" in result
