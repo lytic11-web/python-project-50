@@ -37,3 +37,28 @@ def flat_yaml1_path():
 @pytest.fixture
 def flat_yaml2_path():
     return get_fixture_path("flat/file2.yml")
+
+
+@pytest.fixture
+def nested_json1_path():
+    return get_fixture_path("nested/file1.json")
+
+
+@pytest.fixture
+def nested_json2_path():
+    return get_fixture_path("nested/file2.json")
+
+
+@pytest.fixture
+def nested_yaml1_path():
+    return get_fixture_path("nested/file1.yml")
+
+
+@pytest.fixture
+def nested_yaml2_path():
+    return get_fixture_path("nested/file2.yml")
+
+
+@pytest.fixture
+def expected_nested_stylish():
+    return read_fixture("nested/expected_stylish.txt")
