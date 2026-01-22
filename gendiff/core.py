@@ -1,100 +1,134 @@
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from gendiff.parsers import parse_file
 
 
-def read_file(file_path: str) -> Dict[str, Any]:
-    """Читает и парсит JSON или YAML файлы."""
-    return parse_file(file_path)
-
-
-def get_diff(
-    data1: Dict[str, Any], data2: Dict[str, Any]
-) -> List[Dict[str, Any]]:
+def build_tree(data1: Dict, data2: Dict) -> Dict:
     """
-    Сравнивает два плоских словаря и возвращает список различий.
+    Строит дерево различий между двумя словарями.
 
-    Каждый элемент списка - словарь с ключами:
-    - 'key': имя ключа
-    - 'value': значение
-    - 'status': 'unchanged', 'added', 'removed', или 'changed'
-    - 'old_value': старое значение (только для 'changed')
+    Возвращает словарь, где:
+    - type: 'unchanged', 'changed', 'added', 'removed', 'nested'
+    - value: значение (для unchanged, added, removed)
+    - old_value, new_value: для changed
+    - children: для nested
     """
-    diff = []
+    result = {}
 
-    # Получаем все уникальные ключи в алфавитном порядке
+    # Все уникальные ключи
     all_keys = sorted(set(data1.keys()) | set(data2.keys()))
 
     for key in all_keys:
+        # Ключ только в первом файле
         if key not in data2:
-            # Ключ только в первом файле (удален)
-            diff.append({"key": key, "value": data1[key], "status": "removed"})
+            result[key] = {"type": "removed", "value": data1[key]}
+
+        # Ключ только во втором файле
         elif key not in data1:
-            # Ключ только во втором файле (добавлен)
-            diff.append({"key": key, "value": data2[key], "status": "added"})
-        elif data1[key] == data2[key]:
-            # Ключ в обоих файлах без изменений
-            diff.append(
-                {"key": key, "value": data1[key], "status": "unchanged"}
-            )
+            result[key] = {"type": "added", "value": data2[key]}
+
+        # Ключ в обоих файлах
         else:
-            # Ключ в обоих файлах, но значения разные
-            diff.append(
-                {
-                    "key": key,
-                    "value": data1[key],
-                    "status": "removed",  # старое значение
+            value1 = data1[key]
+            value2 = data2[key]
+
+            # Если оба значения - словари, рекурсивно сравниваем
+            if isinstance(value1, dict) and isinstance(value2, dict):
+                result[key] = {
+                    "type": "nested",
+                    "children": build_tree(value1, value2),
                 }
-            )
-            diff.append(
-                {
-                    "key": key,
-                    "value": data2[key],
-                    "status": "added",  # новое значение
+
+            # Если значения разные
+            elif value1 != value2:
+                result[key] = {
+                    "type": "changed",
+                    "old_value": value1,
+                    "new_value": value2,
                 }
-            )
 
-    return diff
+            # Если значения одинаковые
+            else:
+                result[key] = {"type": "unchanged", "value": value1}
+
+    return result
 
 
-def format_stylish(diff: List[Dict[str, Any]]) -> str:
+def format_stylish(diff: Dict, depth: int = 0) -> str:
     """
-    Форматирует различия в формате 'stylish'.
+    Форматирует дерево различий в stylish формате.
 
-    Пример вывода:
-    {
-      - follow: false
-        host: hexlet.io
-      - proxy: 123.234.53.22
-      - timeout: 50
-      + timeout: 20
-      + verbose: true
-    }
+    Args:
+        diff: дерево различий
+        depth: текущая глубина для отступов
+
+    Returns:
+        Строка в формате stylish
     """
-    lines = ["{"]
+    lines = []
+    indent = "    " * depth  # 4 пробела на уровень
 
-    for item in diff:
-        status = item["status"]
-        key = item["key"]
-        value = item["value"]
+    for key, node in sorted(diff.items()):
+        node_type = node["type"]
 
-        # Преобразуем булевы значения в строки
-        if isinstance(value, bool):
-            value = str(value).lower()
-        elif value is None:
-            value = "null"
+        if node_type == "nested":
+            lines.append(f"{indent}    {key}: {{")
+            lines.append(format_stylish(node["children"], depth + 1))
+            lines.append(f"{indent}    }}")
 
-        if status == "unchanged":
-            lines.append(f"    {key}: {value}")
-        elif status == "removed":
-            lines.append(f"  - {key}: {value}")
-        elif status == "added":
-            lines.append(f"  + {key}: {value}")
+        elif node_type == "changed":
+            old_formatted = format_value(node["old_value"], depth + 1)
+            new_formatted = format_value(node["new_value"], depth + 1)
+            lines.append(f"{indent}  - {key}: {old_formatted}")
+            lines.append(f"{indent}  + {key}: {new_formatted}")
 
-    lines.append("}")
+        elif node_type == "added":
+            formatted_value = format_value(node["value"], depth + 1)
+            lines.append(f"{indent}  + {key}: {formatted_value}")
 
-    return "\n".join(lines)
+        elif node_type == "removed":
+            formatted_value = format_value(node["value"], depth + 1)
+            lines.append(f"{indent}  - {key}: {formatted_value}")
+
+        elif node_type == "unchanged":
+            formatted_value = format_value(node["value"], depth + 1)
+            lines.append(f"{indent}    {key}: {formatted_value}")
+
+    # Для корневого уровня добавляем фигурные скобки
+    if depth == 0:
+        return "{\n" + "\n".join(lines) + "\n}"
+    else:
+        return "\n".join(lines)
+
+
+def format_value(value: Any, depth: int) -> str:
+    """
+    Форматирует значение для вывода.
+
+    Args:
+        value: значение для форматирования
+        depth: текущая глубина для отступов
+
+    Returns:
+        Отформатированная строка
+    """
+    if isinstance(value, dict):
+        indent = "    " * depth
+        lines = ["{"]
+        for key, val in sorted(value.items()):
+            formatted_val = format_value(val, depth + 1)
+            lines.append(f"{indent}    {key}: {formatted_val}")
+        lines.append(f"{indent}}}")
+        return "\n".join(lines)
+
+    # Специальные преобразования
+    if isinstance(value, bool):
+        return str(value).lower()
+    elif value is None:
+        return "null"
+    else:
+        return str(value)
 
 
 def generate_diff(
@@ -106,26 +140,29 @@ def generate_diff(
     Args:
         file1_path: путь к первому файлу
         file2_path: путь ко второму файлу
-        format: формат вывода (пока только 'stylish' поддерживается)
+        format: формат вывода
 
     Returns:
         Строка с различиями в указанном формате
     """
     # Читаем файлы
-    data1 = read_file(file1_path)
-    data2 = read_file(file2_path)
+    data1 = parse_file(file1_path)
+    data2 = parse_file(file2_path)
 
-    # Получаем различия
-    diff = get_diff(data1, data2)
+    # Строим дерево различий
+    diff_tree = build_tree(data1, data2)
 
     # Форматируем вывод
     if format == "stylish":
-        return format_stylish(diff)
+        return format_stylish(diff_tree)
     elif format == "plain":
-        # Пока заглушка
         return "Plain format will be implemented later"
     elif format == "json":
-        # Пока заглушка
-        return json.dumps(diff, indent=2)
+        return json.dumps(diff_tree, indent=2)
     else:
         raise ValueError(f"Unsupported format: {format}")
+
+
+def read_file(file_path: str) -> Dict[str, Any]:
+    """Читает и парсит JSON или YAML файлы."""
+    return parse_file(file_path)
