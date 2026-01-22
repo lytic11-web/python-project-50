@@ -13,3 +13,4 @@ A tool for finding differences between configuration files.
 ### Demo
 
 - [Comparison](https://asciinema.org/a/ASIrCBXGMmiDIYUd)
+- [Comparison.yml](https://asciinema.org/a/ul3zYRrAPbzO6ELl)
