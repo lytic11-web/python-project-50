@@ -1,3 +1,8 @@
+import json
+import tempfile
+
+import pytest
+
 from gendiff import generate_diff
 
 
@@ -45,7 +50,52 @@ def test_generate_diff_plain_format(flat_json1_path, flat_json2_path):
 
 
 def test_generate_diff_json_format(flat_json1_path, flat_json2_path):
-    """Test JSON format (should return stub for now)."""
+    """Test JSON format output."""
     result = generate_diff(flat_json1_path, flat_json2_path, "json")
     assert isinstance(result, str)
     assert result  # Not empty
+    # Проверяем, что это валидный JSON
+    json.loads(result)
+
+
+def test_generate_diff_nested_json(
+    nested_json1_path, nested_json2_path, expected_nested_stylish
+):
+    """Test nested JSON comparison with stylish format."""
+    result = generate_diff(nested_json1_path, nested_json2_path)
+    assert result == expected_nested_stylish
+
+
+def test_generate_diff_nested_yaml(
+    nested_yaml1_path, nested_yaml2_path, expected_nested_stylish
+):
+    """Test nested YAML comparison with stylish format."""
+    result = generate_diff(nested_yaml1_path, nested_yaml2_path)
+    assert result == expected_nested_stylish
+
+
+def test_unsupported_file_format():
+    """Test error for unsupported file format."""
+    with tempfile.NamedTemporaryFile(suffix=".txt", mode="w") as f1:
+        f1.write("some text")
+        f1.flush()
+
+        with tempfile.NamedTemporaryFile(suffix=".txt", mode="w") as f2:
+            f2.write("other text")
+            f2.flush()
+
+            with pytest.raises(ValueError, match="Unsupported file format"):
+                generate_diff(f1.name, f2.name)
+
+
+def test_unsupported_output_format(flat_json1_path, flat_json2_path):
+    """Test error for unsupported output format."""
+    with pytest.raises(ValueError, match="Unsupported format"):
+        generate_diff(flat_json1_path, flat_json2_path, format="html")
+
+
+def test_cli_script_import():
+    """Test that CLI script can be imported."""
+    from gendiff.scripts.gendiff import main
+
+    assert callable(main)

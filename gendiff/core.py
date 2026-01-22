@@ -58,43 +58,43 @@ def build_tree(data1: Dict, data2: Dict) -> Dict:
 def format_stylish(diff: Dict, depth: int = 0) -> str:
     """
     Форматирует дерево различий в stylish формате.
-
+    
     Args:
         diff: дерево различий
         depth: текущая глубина для отступов
-
+    
     Returns:
         Строка в формате stylish
     """
     lines = []
     indent = "    " * depth  # 4 пробела на уровень
-
+    
     for key, node in sorted(diff.items()):
-        node_type = node["type"]
-
-        if node_type == "nested":
+        node_type = node['type']
+        
+        if node_type == 'nested':
             lines.append(f"{indent}    {key}: {{")
-            lines.append(format_stylish(node["children"], depth + 1))
+            lines.append(format_stylish(node['children'], depth + 1))
             lines.append(f"{indent}    }}")
-
-        elif node_type == "changed":
-            old_formatted = format_value(node["old_value"], depth + 1)
-            new_formatted = format_value(node["new_value"], depth + 1)
-            lines.append(f"{indent}  - {key}: {old_formatted}")
-            lines.append(f"{indent}  + {key}: {new_formatted}")
-
-        elif node_type == "added":
-            formatted_value = format_value(node["value"], depth + 1)
-            lines.append(f"{indent}  + {key}: {formatted_value}")
-
-        elif node_type == "removed":
-            formatted_value = format_value(node["value"], depth + 1)
-            lines.append(f"{indent}  - {key}: {formatted_value}")
-
-        elif node_type == "unchanged":
-            formatted_value = format_value(node["value"], depth + 1)
-            lines.append(f"{indent}    {key}: {formatted_value}")
-
+        
+        elif node_type == 'changed':
+            old_formatted = format_value(node['old_value'], depth + 1)
+            new_formatted = format_value(node['new_value'], depth + 1)
+            lines.append(f"{indent}    - {key}: {old_formatted}")
+            lines.append(f"{indent}    + {key}: {new_formatted}")
+        
+        elif node_type == 'added':
+            formatted_value = format_value(node['value'], depth + 1)
+            lines.append(f"{indent}    + {key}: {formatted_value}")
+        
+        elif node_type == 'removed':
+            formatted_value = format_value(node['value'], depth + 1)
+            lines.append(f"{indent}    - {key}: {formatted_value}")
+        
+        elif node_type == 'unchanged':
+            formatted_value = format_value(node['value'], depth + 1)
+            lines.append(f"{indent}      {key}: {formatted_value}")
+    
     # Для корневого уровня добавляем фигурные скобки
     if depth == 0:
         return "{\n" + "\n".join(lines) + "\n}"
@@ -105,11 +105,11 @@ def format_stylish(diff: Dict, depth: int = 0) -> str:
 def format_value(value: Any, depth: int) -> str:
     """
     Форматирует значение для вывода.
-
+    
     Args:
         value: значение для форматирования
         depth: текущая глубина для отступов
-
+    
     Returns:
         Отформатированная строка
     """
@@ -119,9 +119,9 @@ def format_value(value: Any, depth: int) -> str:
         for key, val in sorted(value.items()):
             formatted_val = format_value(val, depth + 1)
             lines.append(f"{indent}    {key}: {formatted_val}")
-        lines.append(f"{indent}}}")
+        lines.append(f"{indent}" + "}")
         return "\n".join(lines)
-
+    
     # Специальные преобразования
     if isinstance(value, bool):
         return str(value).lower()
