@@ -1,6 +1,7 @@
 import json
-from typing import Any, Dict
+from typing import Dict
 
+from gendiff.formatters import get_formatter
 from gendiff.parsers import parse_file
 
 
@@ -55,82 +56,6 @@ def build_tree(data1: Dict, data2: Dict) -> Dict:
     return result
 
 
-def format_stylish(diff: Dict, depth: int = 0) -> str:
-    """
-    Форматирует дерево различий в stylish формате.
-    
-    Args:
-        diff: дерево различий
-        depth: текущая глубина для отступов
-    
-    Returns:
-        Строка в формате stylish
-    """
-    lines = []
-    indent = "    " * depth  # 4 пробела на уровень
-    
-    for key, node in sorted(diff.items()):
-        node_type = node['type']
-        
-        if node_type == 'nested':
-            lines.append(f"{indent}    {key}: {{")
-            lines.append(format_stylish(node['children'], depth + 1))
-            lines.append(f"{indent}    }}")
-        
-        elif node_type == 'changed':
-            old_formatted = format_value(node['old_value'], depth + 1)
-            new_formatted = format_value(node['new_value'], depth + 1)
-            lines.append(f"{indent}    - {key}: {old_formatted}")
-            lines.append(f"{indent}    + {key}: {new_formatted}")
-        
-        elif node_type == 'added':
-            formatted_value = format_value(node['value'], depth + 1)
-            lines.append(f"{indent}    + {key}: {formatted_value}")
-        
-        elif node_type == 'removed':
-            formatted_value = format_value(node['value'], depth + 1)
-            lines.append(f"{indent}    - {key}: {formatted_value}")
-        
-        elif node_type == 'unchanged':
-            formatted_value = format_value(node['value'], depth + 1)
-            lines.append(f"{indent}      {key}: {formatted_value}")
-    
-    # Для корневого уровня добавляем фигурные скобки
-    if depth == 0:
-        return "{\n" + "\n".join(lines) + "\n}"
-    else:
-        return "\n".join(lines)
-
-
-def format_value(value: Any, depth: int) -> str:
-    """
-    Форматирует значение для вывода.
-    
-    Args:
-        value: значение для форматирования
-        depth: текущая глубина для отступов
-    
-    Returns:
-        Отформатированная строка
-    """
-    if isinstance(value, dict):
-        indent = "    " * depth
-        lines = ["{"]
-        for key, val in sorted(value.items()):
-            formatted_val = format_value(val, depth + 1)
-            lines.append(f"{indent}    {key}: {formatted_val}")
-        lines.append(f"{indent}" + "}")
-        return "\n".join(lines)
-    
-    # Специальные преобразования
-    if isinstance(value, bool):
-        return str(value).lower()
-    elif value is None:
-        return "null"
-    else:
-        return str(value)
-
-
 def generate_diff(
     file1_path: str, file2_path: str, format: str = "stylish"
 ) -> str:
@@ -140,7 +65,7 @@ def generate_diff(
     Args:
         file1_path: путь к первому файлу
         file2_path: путь ко второму файлу
-        format: формат вывода
+        format: формат вывода ('stylish', 'plain', 'json')
 
     Returns:
         Строка с различиями в указанном формате
@@ -152,17 +77,9 @@ def generate_diff(
     # Строим дерево различий
     diff_tree = build_tree(data1, data2)
 
-    # Форматируем вывод
-    if format == "stylish":
-        return format_stylish(diff_tree)
-    elif format == "plain":
-        return "Plain format will be implemented later"
-    elif format == "json":
+    # Выбираем форматтер
+    if format == "json":
         return json.dumps(diff_tree, indent=2)
-    else:
-        raise ValueError(f"Unsupported format: {format}")
 
-
-def read_file(file_path: str) -> Dict[str, Any]:
-    """Читает и парсит JSON или YAML файлы."""
-    return parse_file(file_path)
+    formatter = get_formatter(format)
+    return formatter(diff_tree)
