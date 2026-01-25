@@ -15,3 +15,4 @@ A tool for finding differences between configuration files.
 - [Comparison](https://asciinema.org/a/ASIrCBXGMmiDIYUd)
 - [Comparison.yml](https://asciinema.org/a/ul3zYRrAPbzO6ELl)
 - [Comparison.tree.json](https://asciinema.org/a/Nsy7UZPGfnfUTiqd)
+- [Comparison.format.plain](https://asciinema.org/a/gc74WiOmuLSqw4jz)
