@@ -30,6 +30,11 @@ def expected_stylish():
 
 
 @pytest.fixture
+def expected_plain():
+    return read_fixture("flat/expected_plain.txt")
+
+
+@pytest.fixture
 def flat_yaml1_path():
     return get_fixture_path("flat/file1.yml")
 
@@ -62,3 +67,8 @@ def nested_yaml2_path():
 @pytest.fixture
 def expected_nested_stylish():
     return read_fixture("nested/expected_stylish.txt")
+
+
+@pytest.fixture
+def expected_nested_plain():
+    return read_fixture("nested/expected_plain.txt")

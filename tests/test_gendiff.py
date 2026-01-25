@@ -42,11 +42,20 @@ def test_generate_diff_flat_json_with_format(flat_json1_path, flat_json2_path):
     assert "verbose: true" in result
 
 
-def test_generate_diff_plain_format(flat_json1_path, flat_json2_path):
-    """Test plain format (should return stub for now)."""
+def test_generate_diff_plain_format_flat(
+    flat_json1_path, flat_json2_path, expected_plain
+):
+    """Test plain format with flat data."""
     result = generate_diff(flat_json1_path, flat_json2_path, "plain")
-    assert isinstance(result, str)
-    assert result  # Not empty
+    assert result == expected_plain
+
+
+def test_generate_diff_plain_format_nested(
+    nested_json1_path, nested_json2_path, expected_nested_plain
+):
+    """Test plain format with nested data."""
+    result = generate_diff(nested_json1_path, nested_json2_path, "plain")
+    assert result == expected_nested_plain
 
 
 def test_generate_diff_json_format(flat_json1_path, flat_json2_path):
@@ -91,7 +100,7 @@ def test_unsupported_file_format():
 def test_unsupported_output_format(flat_json1_path, flat_json2_path):
     """Test error for unsupported output format."""
     with pytest.raises(ValueError, match="Unsupported format"):
-        generate_diff(flat_json1_path, flat_json2_path, format="html")
+        generate_diff(flat_json1_path, flat_json2_path, "html")
 
 
 def test_cli_script_import():
