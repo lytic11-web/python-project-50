@@ -1,4 +1,3 @@
-import json
 from typing import Dict
 
 from gendiff.formatters import get_formatter
@@ -76,10 +75,6 @@ def generate_diff(
 
     # Строим дерево различий
     diff_tree = build_tree(data1, data2)
-
-    # Выбираем форматтер
-    if format == "json":
-        return json.dumps(diff_tree, indent=2)
 
     formatter = get_formatter(format)
     return formatter(diff_tree)
