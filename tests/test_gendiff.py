@@ -83,6 +83,23 @@ def test_generate_diff_nested_yaml(
     assert result == expected_nested_stylish
 
 
+def test_generate_diff_json_format_nested(
+    nested_json1_path, nested_json2_path, expected_json_nested
+):
+    """Test JSON format output with nested data."""
+    result = generate_diff(nested_json1_path, nested_json2_path, "json")
+    
+    # Сравниваем как строки (с учетом форматирования)
+    assert result == expected_json_nested
+    
+    # Дополнительно проверяем, что это валидный JSON
+    parsed_result = json.loads(result)
+    parsed_expected = json.loads(expected_json_nested)
+    
+    # И что структуры совпадают
+    assert parsed_result == parsed_expected
+
+
 def test_unsupported_file_format():
     """Test error for unsupported file format."""
     with tempfile.NamedTemporaryFile(suffix=".txt", mode="w") as f1:

@@ -35,6 +35,11 @@ def expected_plain():
 
 
 @pytest.fixture
+def expected_json_flat():
+    return read_fixture("flat/expected_json.txt")
+
+
+@pytest.fixture
 def flat_yaml1_path():
     return get_fixture_path("flat/file1.yml")
 
@@ -52,6 +57,11 @@ def nested_json1_path():
 @pytest.fixture
 def nested_json2_path():
     return get_fixture_path("nested/file2.json")
+
+
+@pytest.fixture
+def expected_json_nested():
+    return read_fixture("nested/expected_json.txt")
 
 
 @pytest.fixture
