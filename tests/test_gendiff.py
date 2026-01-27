@@ -88,14 +88,14 @@ def test_generate_diff_json_format_nested(
 ):
     """Test JSON format output with nested data."""
     result = generate_diff(nested_json1_path, nested_json2_path, "json")
-    
+
     # Сравниваем как строки (с учетом форматирования)
     assert result == expected_json_nested
-    
+
     # Дополнительно проверяем, что это валидный JSON
     parsed_result = json.loads(result)
     parsed_expected = json.loads(expected_json_nested)
-    
+
     # И что структуры совпадают
     assert parsed_result == parsed_expected
 

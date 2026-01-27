@@ -17,7 +17,9 @@
       "setting3": {
         "type": "changed",
         "old_value": true,
-        "new_value": null
+        "new_value": {
+          "key": "value"
+        }
       },
       "setting4": {
         "type": "added",
@@ -37,7 +39,7 @@
             "children": {
               "wow": {
                 "type": "changed",
-                "old_value": "",
+                "old_value": "too much",
                 "new_value": "so much"
               }
             }
@@ -93,6 +95,53 @@
         }
       },
       "fee": 100500
+    }
+  },
+  "group4": {
+    "type": "nested",
+    "children": {
+      "default": {
+        "type": "changed",
+        "old_value": null,
+        "new_value": ""
+      },
+      "foo": {
+        "type": "changed",
+        "old_value": 0,
+        "new_value": null
+      },
+      "isNested": {
+        "type": "changed",
+        "old_value": false,
+        "new_value": "none"
+      },
+      "key": {
+        "type": "added",
+        "value": false
+      },
+      "nest": {
+        "type": "nested",
+        "children": {
+          "bar": {
+            "type": "changed",
+            "old_value": "",
+            "new_value": 0
+          },
+          "isNested": {
+            "type": "removed",
+            "value": true
+          }
+        }
+      },
+      "someKey": {
+        "type": "added",
+        "value": true
+      },
+      "type": {
+        "type": "changed",
+        "old_value": "bas",
+        "new_value": "bar"
+      }
     }
   }
 }
