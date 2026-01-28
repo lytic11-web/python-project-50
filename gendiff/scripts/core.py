@@ -1,7 +1,7 @@
 from typing import Dict
 
 from gendiff.formatters import get_formatter
-from gendiff.parsers import parse_file
+from gendiff.scripts.parsers import parse_file
 
 
 def build_tree(data1: Dict, data2: Dict) -> Dict:
